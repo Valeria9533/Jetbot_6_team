@@ -11,12 +11,12 @@ grabbed, frame = camera.read()
 
 img = cv2.imread("gate_image.jpg")
 hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-blur_hsv = cv2.GaussianBlur(hsv, (5,5),0)
+blur_hsv = cv2.GaussianBlur(hsv, (1,1),0)
 mask = cv2.inRange(blur_hsv,(32, 90, 90), (85, 255, 255) )
 cv2.imshow("green", mask);cv2.waitKey();cv2.destroyAllWindows()
 
 blur_mask = cv2.GaussianBlur(mask, (9, 9), 0)
-edged = cv2.Canny(blur_mask, 50, 150)
+edged = cv2.Canny(blur_mask, 200, 500)
 edged = cv2.GaussianBlur(edged, (9,9),0)
 
 cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
@@ -29,7 +29,7 @@ cv2.imshow("gate", edged);cv2.waitKey();cv2.destroyAllWindows()
 for c in cnts:
     # approximate the contour
     peri = cv2.arcLength(c, True)
-    approx = cv2.approxPolyDP(c, 0.01 * peri, True)
+    approx = cv2.approxPolyDP(c, 0.1 * peri, True)
 
     if len(approx) >= 4 and len(approx) <= 12:
         cv2.drawContours(img, [approx], -1, (0, 0, 255), 4)
