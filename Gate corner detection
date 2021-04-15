@@ -4,9 +4,10 @@ import imutils
 import time
 
 
-camera = cv2.VideoCapture('gate_video2.avi')
 
+camera = cv2.VideoCapture('gate_video2.avi')
 while True:
+    get_corners()
     ### Grabbing the video feed, "has frames" and "grabbed" check if
     ###there's a next frame, if there isn't, the feed will stop
 
@@ -69,14 +70,14 @@ while True:
         if peri >= 410:
 
             approx = cv2.approxPolyDP(c, 0.05 * peri, True)
-            
+
             ### Collect long enough contours into the list
             lista = np.append(lista,approx).astype(int)
             count += len(approx)
 
         else:
             continue
-        
+
         ### If there are between 4 and 10 corners, draw the contour on the "image"
         if len(approx) >= 4 and len(approx) <= 10:
 
@@ -103,26 +104,48 @@ while True:
         corners = cv2.goodFeaturesToTrack(mask3, 4, 0.05, 110)
         corners = np.int0(corners)
         #print(corners)
-        
+
         ### Draws yellow corners on "image"
         for i in corners:
             x, y = i.ravel()
-            cv2.circle(image, (x, y), 11, (0,255,255), -1)
+            cv2.circle(image, (x, y), 1, (0,255,255), -1)
+
+
+        target = [0,255,255]
+        X,Y = np.array(np.where(np.all(image==target, axis=2)))
+
+        coordinates = np.array([])
+        for c in range(0,19,5):
+            coordinates = np.append(coordinates,X[c])
+            coordinates = np.append(coordinates, Y[c])
+
+        coordinates = np.reshape(coordinates,(4,2))
+
+
+        print(coordinates)
+        #print(Y)
+        #print(X)
+
     except:
 
         cv2.imshow("gate2", image)
 
         time.sleep(0.05)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
 
     cv2.imshow("gate2", image)
 
-
     # cv2.imshow('Filming', img)
     time.sleep(0.05)
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 camera.release()
 cv2.destroyAllWindows()
+
+
+
+
