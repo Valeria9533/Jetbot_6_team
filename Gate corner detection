@@ -105,6 +105,21 @@ while True:
         corners = np.int0(corners)
         #print(corners)
 
+        ret, labels, stats, centroids = cv2.connectedComponentsWithStats(mask3)
+        mask3 = cv2.cvtColor(mask3, cv2.COLOR_GRAY2BGR)
+        for i in centroids[1:]:
+            cv2.rectangle(image, (int(i[0]), int(i[1])), (int(i[0] + 5), int(i[1] + 5)), (255, 0, 0), 3)
+
+        center_width = int(image.shape[0]/2)
+        center_height = int(image.shape[1]/2)
+
+        cv2.circle(image, (center_height, center_width), 10, (0, 0, 255), -1)
+        
+    
+
+        cv2.imshow("mask 3", mask3)
+
+
         ### Draws yellow corners on "image"
         for i in corners:
             x, y = i.ravel()
