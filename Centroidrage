@@ -1,0 +1,4 @@
+ret, labels, stats, centroids = cv2.connectedComponentsWithStats(mask)
+        mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
+        for i in centroids[1:]:
+                cv2.rectangle(mask, (int(i[0]),int(i[1])), (int(i[0]+5), int(i[1]+5)),(255,0,0), 3)
