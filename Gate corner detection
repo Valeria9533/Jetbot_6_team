@@ -103,21 +103,36 @@ while True:
 
         corners = cv2.goodFeaturesToTrack(mask3, 4, 0.05, 110)
         corners = np.int0(corners)
-        #print(corners)
-
+        
+        
+        ### This get and draws he center of gate
         ret, labels, stats, centroids = cv2.connectedComponentsWithStats(mask3)
         mask3 = cv2.cvtColor(mask3, cv2.COLOR_GRAY2BGR)
         for i in centroids[1:]:
             cv2.rectangle(image, (int(i[0]), int(i[1])), (int(i[0] + 5), int(i[1] + 5)), (255, 0, 0), 3)
+        ### And this gets the center of  image frame
+        center_width = int(image.shape[1]/2)
+        center_height = int(image.shape[0]/2)
 
-        center_width = int(image.shape[0]/2)
-        center_height = int(image.shape[1]/2)
+        cv2.circle(image, (center_width, center_height), 10, (0, 0, 255), -1)
+   
+        ### Here we compare the two different centers to determine where to move
+        if center_width - centroids[1][0] > 20:
+            print('Fly Left')
 
-        cv2.circle(image, (center_height, center_width), 10, (0, 0, 255), -1)
-        
-    
+        elif center_width - centroids[1][0] < -20:
+            print('Fly Right')
+        else:
+            print('Stay in line')
 
-        cv2.imshow("mask 3", mask3)
+        if center_height - centroids[1][1] > 20:
+            print('Fly Up')
+
+        elif center_height - centroids[1][1] < -20:
+            print('Fly Down')
+        else:
+            print('Stay in Level')
+       
 
 
         ### Draws yellow corners on "image"
@@ -135,11 +150,6 @@ while True:
             coordinates = np.append(coordinates, Y[c])
 
         coordinates = np.reshape(coordinates,(4,2))
-
-
-        #qprint(coordinates)
-        #print(Y)
-        #print(X)
 
     except:
 
@@ -181,12 +191,6 @@ while True:
             print('Centered')
             print()
 
-        #print('.......')
-        #print(bot_left)
-        #print(top_left)
-        #print(bot_right)
-        #print(top_right)
-        #print('.......')
     except:
         continue
 
