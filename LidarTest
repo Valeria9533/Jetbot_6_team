@@ -1,0 +1,35 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from rplidar import RPLidar
+import math
+
+def get_data():
+    lidar = RPLidar('/dev/ttyUSB0')
+    s = []
+    for i, scan in enumerate(lidar.iter_measurments(max_buf_meas=3000)):
+        #if i%5 == 0:
+        s.append(scan)
+        if i > 750:
+            break
+    lidar.stop()
+    return s
+fig = plt.figure()
+i= 0
+while(True):
+    #if(i%3==0):
+    x = []
+    y = []
+    #i = 0
+    #print(i)
+    current_data=get_data()
+    for point in current_data:
+        x.append(math.radians(point[2]))
+        y.append(point[3])
+    plt.clf()
+    ax = fig.add_subplot(projection = 'polar')
+    ax.set_ylim(0, 4500)
+    ax.set_theta_direction(-1)
+    ax.set_theta_zero_location('N')
+    ax.scatter(x, y)
+    plt.pause(.001)
+    i += 1
