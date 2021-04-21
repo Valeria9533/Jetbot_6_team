@@ -103,6 +103,10 @@ while True:
 
     mask2 = cv2.inRange(image, (0, 0, 250), (0, 0, 255))
     gray = mask2
+    
+    inline = False
+    inlevel = False
+    centered = False
 
     try:
         ### Draw the connecting contour (green) and use convex hull to surround it to get outermost edges and corners
@@ -128,9 +132,6 @@ while True:
         cv2.circle(image, (center_width, center_height), 10, (0, 0, 255), -1)
    
         ### Here we compare the two different centers to determine where to move
-        inline = False
-        inlevel = False
-        centered = False
         
         if center_width - centroids[1][0] > 20:
             #print('Fly Left')
