@@ -7,7 +7,7 @@ import time
 
 camera = cv2.VideoCapture('gate_video2.avi')
 while True:
-    get_corners()
+   # get_corners():
     ### Grabbing the video feed, "has frames" and "grabbed" check if
     ###there's a next frame, if there isn't, the feed will stop
 
@@ -122,7 +122,7 @@ while True:
         coordinates = np.reshape(coordinates,(4,2))
 
 
-        print(coordinates)
+        #qprint(coordinates)
         #print(Y)
         #print(X)
 
@@ -143,6 +143,38 @@ while True:
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
+    try:
+        bot_left = np.argmin(coordinates[2:4,1]) + 2
+        top_left = np.argmin(coordinates[0:2,1])
+        bot_right = np.argmax(coordinates[2:4,1]) + 2
+        top_right = np.argmax(coordinates[0:2,1])
+
+        #print(coordinates[bot_left])
+        #print(coordinates[2])
+        if (coordinates[bot_left][0] - coordinates[top_left][0]) - (coordinates[bot_right][0] - coordinates[top_right][0]) >8:
+            print()
+            print('Rotate to Left ')
+            print()
+        if (coordinates[bot_right][0] - coordinates[top_right][0]) - (coordinates[bot_left][0] - coordinates[top_left][0]) >8:
+            print()
+            print('Rotate to Right ')
+            print()
+
+        else:
+            print()
+            print('Centered')
+            print()
+
+        #print('.......')
+        #print(bot_left)
+        #print(top_left)
+        #print(bot_right)
+        #print(top_right)
+        #print('.......')
+    except:
+        continue
+
 camera.release()
 cv2.destroyAllWindows()
 
