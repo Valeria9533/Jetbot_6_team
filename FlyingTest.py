@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import imutils
 import time
-import tellopy
+#import tellopy
 #import av
 from djitellopy import Tello
 
@@ -10,7 +10,7 @@ drone = Tello()
 
 try:
     drone.connect()
-    drone.wait_for_connection(60.0)
+    #drone.wait_for_connection(60.0)
 except Exception as ex:
     print(ex)
 
@@ -33,7 +33,7 @@ except:
 drone.streamon()
 
 
-
+iterators=0
 
 while (True):
     
@@ -50,7 +50,7 @@ while (True):
     print("Camera try")
     img = camera.frame
     image = camera.frame
-    cv2.imwrite("img.png", img)
+    #cv2.imwrite("img.png", img)
     if img is None:
          print("none")
          continue
@@ -63,7 +63,20 @@ while (True):
     #grabbed, img = camera.read()
     #image = img
     ### Changing the frame into hsv colors and blurring it in various ways to smoothen
-
+    """
+    if (iterators == 0):
+         drone.move_left(20)
+         iterators += 1
+         time.sleep(0.5)
+    if (iterators == 1):
+         drone.move_right(20)
+         iterators += 1
+         time.sleep(0.5)
+    if (iterators == 2):
+         drone.land()
+         time.sleep(0.5)
+    iterators += 2
+    """
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     blur_hsv = cv2.GaussianBlur(hsv, (1,1),0)
@@ -123,7 +136,7 @@ while (True):
 
         ### If there are between 4 and 10 corners, draw the contour on the "image"
         if len(approx) >= 4 and len(approx) <= 10:
-            cv2.imwrite("Test.png", image)
+            #cv2.imwrite("Test.png", image)
             cv2.drawContours(image, [approx], -1, (0, 0, 255), 5)
 
     try:
@@ -167,11 +180,11 @@ while (True):
         
         if center_width - centroids[1][0] > 20:
             print('Fly Left')
-            drone.move_left(1)
+            drone.move_left(20)
             
         elif center_width - centroids[1][0] < -20:
             print('Fly Right')
-            drone.move_right(1)
+            drone.move_right(20)
             
         else:
             print('Stay in line')
@@ -179,11 +192,11 @@ while (True):
 
         if center_height - centroids[1][1] > 20:
             print('Fly Up')
-            drone.move_up(1)
+            drone.move_up(20)
 
         elif center_height - centroids[1][1] < -20:
             print('Fly Down')
-            drone.move_down(1)
+            drone.move_down(20)
             
         else:
             print('Stay in Level')
