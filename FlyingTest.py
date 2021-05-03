@@ -13,6 +13,7 @@ try:
     #drone.wait_for_connection(60.0)
 except Exception as ex:
     print(ex)
+    exit()
 
 #drone.streamon()
 #print("Hello hello hello")
@@ -27,17 +28,17 @@ try:
     drone.takeoff()
 except:
     drone.land()
-
+    exit()
 #time.sleep(10)
 
 drone.streamon()
 
-
+camera = drone.get_frame_read()
 iterators=0
-
+close = False
 while (True):
     
-    camera = drone.get_frame_read()
+
     
     # get_corners():
     ### Grabbing the video feed, "has frames" and "grabbed" check if
@@ -153,6 +154,7 @@ while (True):
     inline = False
     inlevel = False
     centered = False
+    
 
     try:
         ### Draw the connecting contour (green) and use convex hull to surround it to get outermost edges and corners
@@ -177,31 +179,37 @@ while (True):
         cv2.circle(image, (center_width, center_height), 10, (0, 0, 255), -1)
         print("end contours")
         ### Here we compare the two different centers to determine where to move
-        
-        if center_width - centroids[1][0] > 20:
+        #cv2.imshow("image", image)
+        #cv2.imshow("img", img)
+
+
+        if center_width - centroids[1][0] > 35:
             print('Fly Left')
             drone.move_left(20)
+            time.sleep(0.1)
             
-        elif center_width - centroids[1][0] < -20:
+        elif center_width - centroids[1][0] < -35:
             print('Fly Right')
             drone.move_right(20)
+            time.sleep(0.25)
             
         else:
             print('Stay in line')
             inline = True
 
-        if center_height - centroids[1][1] > 20:
+        if center_height - centroids[1][1] > 105:
             print('Fly Up')
             drone.move_up(20)
+            time.sleep(0.25)
 
-        elif center_height - centroids[1][1] < -20:
+        elif center_height - centroids[1][1] < 45:
             print('Fly Down')
             drone.move_down(20)
-            
+            time.sleep(0.25)
         else:
             print('Stay in Level')
             inlevel = True
-
+            time.sleep(0.25)
 
         ### Draws yellow corners on "image"
         for i in corners:
@@ -220,7 +228,10 @@ while (True):
         coordinates = np.reshape(coordinates,(4,2))
 
     except:
+        drone.rotate_counter_clockwise(15)
+        time.sleep(0.25)
         print("didn't get contours")
+        
         continue
 
         #cv2.imshow("gate2", image)
@@ -238,44 +249,75 @@ while (True):
 
     #if cv2.waitKey(1) & 0xFF == ord('q'):
         #break
-
+    bot_left = np.argmin(coordinates[2:4,1]) + 2
+    top_left = np.argmin(coordinates[0:2,1])
+    bot_right = np.argmax(coordinates[2:4,1]) + 2
+    top_right = np.argmax(coordinates[0:2,1])
     try:
-        bot_left = np.argmin(coordinates[2:4,1]) + 2
-        top_left = np.argmin(coordinates[0:2,1])
-        bot_right = np.argmax(coordinates[2:4,1]) + 2
-        top_right = np.argmax(coordinates[0:2,1])
+        
 
         #print(coordinates[bot_left])
         #print(coordinates[2])
-        if (coordinates[bot_left][0] - coordinates[top_left][0]) - (coordinates[bot_right][0] - coordinates[top_right][0]) >8:
+        if (coordinates[bot_left][0] - coordinates[top_left][0]) - (coordinates[bot_right][0] - coordinates[top_right][0]) >6:
             #print()
             #print('Rotate to Left ')
             #print()
-            drone.counter_clockwise(5)
+            drone.rotate_counter_clockwise(5)
+            time.sleep(0.25)
             
-        if (coordinates[bot_right][0] - coordinates[top_right][0]) - (coordinates[bot_left][0] - coordinates[top_left][0]) >8:
+        if (coordinates[bot_right][0] - coordinates[top_right][0]) - (coordinates[bot_left][0] - coordinates[top_left][0]) >6:
             #print()
             #print('Rotate to Right ')
             #print()
-            drone.clockwise(5)
+            drone.rotate_clockwise(5)
+            time.sleep(0.25)
 
         else:
             #print()
             #print('Centered')
             #print()
             centered = True
+        
+        if (coordinates[bot_left][0] - coordinates[top_left][0]) < 490 and close == False:
+            speed = 2.5/(coordinates[bot_left][0] - coordinates[top_left][0])*4900
+            print(speed)
+            if speed < 20:
+               speed = 20
+            drone.move_forward(int(speed))
+            #close = False
+        else:
+            close = True
 
     except:
+        print("rotate exception")
         continue
+
+    try:
+        leftRigthDist = (coordinates[bot_left][0] - coordinates[top_left][0])>(coordinates[bot_right][0] - coordinates[top_right][0])
+        if ((leftRightDist and (coordinates[top_right][1]-coordinates[top_left][1])<200) and close):
+            drone.move_right(20)
+            print("moving right")
+            time.sleep(0.25)
+        elif ((leftRightDist and (coordinates[top_right][1]-coordinates[top_left][1])<200) and close):
+            drone.move_left(20)
+            print("moving right")
+            time.sleep(0.25)
+    
+    except:
+        print("Angle exception")
         
-    if inline and inlevel and centered:
-        drone.forward(100)
+    print(inline, inlevel, centered, close)
+    if inline and inlevel and centered and close:
+        cv2.imwrite("img.png", img)
+        cv2.imwrite("image.png", image)
+        drone.move_forward(250)
+        time.sleep(0.25)
         break
         
-time.sleep(5)
+time.sleep(0.5)
 drone.land()
-drone.quit()
-#camera.release()
+#drone.quit()
+camera.release()
 #cv2.destroyAllWindows()
 
 
