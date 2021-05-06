@@ -1,0 +1,23 @@
+#move forward
+tello.move_forward(30)
+
+#move backward
+tello.move_back(30)
+
+#move left
+tello.move_left(30)
+
+#move right
+tello.move_right(30)
+
+#rotate clockwise
+tello.rotate_clockwise(30)
+
+#rotate counter clockwise
+tello.rotate_counter_clockwise(30)
+
+#move up
+tello.move_up(30)
+
+#move down
+tello.move_down(30)
