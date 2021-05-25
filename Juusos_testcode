@@ -221,6 +221,7 @@ while (True):
             IAmLost +=1
         else:
             drone.rotate_clockwise(90)
+            time.sleep(0.1)
             IAmLost = 0
         print("didn't get contours")
 
@@ -237,12 +238,14 @@ while (True):
         if left_side - right_side > 6:
 
             drone.rotate_counter_clockwise(25)
+            time.sleep(0.1)
             drone.move_right(50)
             time.sleep(0.1)
 
         if right_side - left_side > 6:
 
             drone.rotate_clockwise(25)
+            time.sleep(0.1)
             drone.move_left(50)
             time.sleep(0.1)
 
@@ -256,6 +259,7 @@ while (True):
             if speed < 20:
                 speed = 20
             drone.move_forward(int(speed))
+            time.sleep(0.1)
             # close = False
         else:
             close = True
