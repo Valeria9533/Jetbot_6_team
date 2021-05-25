@@ -1,0 +1,70 @@
+import cv2
+import time
+import os
+import numpy as np
+from matplotlib import pyplot as plt
+
+path = os.path.abspath('C:/Users/Ville/Downloads/WhatsApp Video 2021-05-21 at 22.11.30.mp4')
+camera = cv2.VideoCapture(path)
+
+imgPath = os.path.abspath("C:/Users/Ville/Desktop/Opiskelu/Uc71R.jpg")
+img = cv2.imread(imgPath,1)
+
+#orb = cv2.ORB_create()
+#kp = orb.detect(img,None)
+#kp1, des1 = orb.compute(img, kp)
+
+sift = cv2.xfeatures2d.SIFT_create()
+kp1, des1 = sift.detectAndCompute(img,None)
+
+FLANN_INDEX_KDTREE = 1
+index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+search_params = dict(checks = 50)
+flann = cv2.FlannBasedMatcher(index_params, search_params)
+MIN_MATCH_COUNT = 10
+
+while camera.isOpened():
+    ret, frame = camera.read()
+    if not ret:
+        print("Can't receive frame (stream end?). Exiting ...")
+        break
+    #kp = orb.detect(frame,None)
+    #kp2, des2 = orb.compute(frame, kp)
+    
+    
+    #calculates the "distance" between points and decides if the match is good enough
+    kp2, des2 = sift.detectAndCompute(frame,None)
+    matches = flann.knnMatch(des1,des2,k=2)
+    print(len(matches))
+    good = []
+    for m,n in matches:
+        if m.distance < 0.7*n.distance:
+            good.append(m)
+    
+    #if enough points were found it takes the corners of the picture and with math magic calculates the points in the picture.
+    #It gives a transform matrix that can be used for the calculation
+    #finally it draws a rectangle to those points
+    if len(good)> MIN_MATCH_COUNT:
+        src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
+        dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
+        M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
+        matchesMask = mask.ravel().tolist()
+        h,w,d = img.shape
+        pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
+        dst = cv2.perspectiveTransform(pts,M)
+        frame = cv2.polylines(frame,[np.int32(dst)],True,255,3, cv2.LINE_AA)
+    else:
+        print( "Not enough matches are found - {}/{}".format(len(good), MIN_MATCH_COUNT) )
+        matchesMask = None
+    #it draws the keypoints that it matched
+    draw_params = dict(matchColor = (0,255,0), # draw matches in green color
+                   singlePointColor = None,
+                   matchesMask = matchesMask, # draw only inliers
+                   flags = 2)
+    show = cv2.drawMatches(img,kp1,frame,kp2,good,None,**draw_params)
+    #plt.imshow(show, 'gray'),plt.show()
+    cv2.imshow('image',show)
+    if cv2.waitKey(1) == ord('q'):
+        break
+camera.release()
+cv2.destroyAllWindows()
