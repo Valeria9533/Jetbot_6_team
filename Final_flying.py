@@ -37,7 +37,7 @@ camera = drone.get_frame_read()
 iterators = 0
 imgCount = 0
 IAmLost = 0
-gates = 3
+gates = 1
 for n in range(gates):
     close = False
     tooManyWrong = 0
@@ -124,7 +124,7 @@ for n in range(gates):
 
             ### approximate the contour and set minimum length fo rrecongised contours
             peri = cv2.arcLength(c, True)
-            if peri >= 680:
+            if peri >= 750:
                 print("contours")
                 approx = cv2.approxPolyDP(c, 0.05 * peri, True)
 
@@ -181,45 +181,45 @@ for n in range(gates):
             # cv2.imshow("image", image)
             # cv2.imshow("img", img)
 
-            if center_width - centroids[1][0] > 38:
+            if center_width - centroids[1][0] > 37:
                 if close:
                    print('Fly Left')
                    drone.move_left(30)
-                   time.sleep(0.25)
+                   time.sleep(0.1)
                    drone.move_right(20)
-                   time.sleep(0.25)
+                   time.sleep(0.1)
                 else:
                    drone.move_left(20)
-                   time.sleep(0.25)
+                   time.sleep(0.1)
 
-            elif center_width - centroids[1][0] < -38:
+            elif center_width - centroids[1][0] < -37:
                 if close:
                    print('Fly Right')
                    drone.move_right(30)
-                   time.sleep(0.25)
+                   time.sleep(0.1)
                    drone.move_left(20)
-                   time.sleep(0.25)
+                   time.sleep(0.1)
                 else:
                    drone.move_right(20)
-                   time.sleep(0.25)
+                   time.sleep(0.1)
 
             else:
                 print('Stay in line')
                 inline = True
 
-            if center_height - centroids[1][1] > 105:
+            if center_height - centroids[1][1] > 95:
                 print('Fly Up')
                 drone.move_up(20)
-                time.sleep(0.25)
+                time.sleep(0.1)
 
-            elif center_height - centroids[1][1] < 45:
+            elif center_height - centroids[1][1] < 35:
                 print('Fly Down')
                 drone.move_down(20)
-                time.sleep(0.25)
+                time.sleep(0.1)
             else:
                 print('Stay in Level')
                 inlevel = True
-                time.sleep(0.25)
+                time.sleep(0.1)
 
             ### Draws yellow corners on "image"
             for i in corners:
@@ -237,15 +237,15 @@ for n in range(gates):
             coordinates = np.reshape(coordinates, (4, 2))
 
         except:
-            if IAmLost< 6:
-                drone.move_forward(30)
-                time.sleep(0.25)
+            if IAmLost< 3:
+                drone.move_forward(50)
+                time.sleep(0.1)
                 drone.rotate_counter_clockwise(15)
-                time.sleep(0.25)
+                time.sleep(0.1)
                 IAmLost +=1
             else:
-                drone.rotate_clockwise(180)
-                time.sleep(0.25)
+                drone.rotate_clockwise(90)
+                time.sleep(0.1)
                 IAmLost = 0
             print("didn't get contours")
 
@@ -282,7 +282,7 @@ for n in range(gates):
                 # print('Rotate to Left ')
                 # print()
                 drone.rotate_counter_clockwise(10)
-                time.sleep(0.25)
+                time.sleep(0.1)
 
             if (coordinates[bot_right][0] - coordinates[top_right][0]) - (
                     coordinates[bot_left][0] - coordinates[top_left][0]) > 6:
@@ -290,7 +290,7 @@ for n in range(gates):
                 # print('Rotate to Right ')
                 # print()
                 drone.rotate_clockwise(10)
-                time.sleep(0.25)
+                time.sleep(0.1)
 
             else:
                 # print()
@@ -304,7 +304,7 @@ for n in range(gates):
                 if speed < 20:
                     speed = 20
                 drone.move_forward(int(speed))
-                time.sleep(0.25)
+                time.sleep(0.1)
                 close = False
             elif gateHeigth < 50:
                 close = False
@@ -312,7 +312,7 @@ for n in range(gates):
                 tooManyWrong += 1
             elif gateHeigth > 560 or tooManyWrong > 3:
                 drone.move_back(20)
-                time.sleep(0.25)
+                time.sleep(0.1)
                 if tooManyWrong > 4:
                     tooManyWrong = 0
                 close = False 
@@ -331,11 +331,11 @@ for n in range(gates):
             if ((leftRightDist and (coordinates[top_right][1] - coordinates[top_left][1]) < 200)):
                 drone.move_right(25)
                 print("moving right")
-                time.sleep(0.25)
+                time.sleep(0.1)
             elif ((RightLeftDist and (coordinates[top_right][1] - coordinates[top_left][1]) < 200)):
                 drone.move_left(25)
                 print("moving left")
-                time.sleep(0.25)
+                time.sleep(0.1)
 
         except:
             print("Angle exception")
@@ -363,9 +363,9 @@ for n in range(gates):
             #cv2.imwrite("img.png", img)
             #cv2.imwrite("image.png", image)
             drone.move_down(20)
-            time.sleep(0.25)
+            time.sleep(0.1)
             drone.move_forward(230)
-            time.sleep(0.25)
+            time.sleep(0.1)
             break
 
 time.sleep(0.5)
