@@ -3,5 +3,5 @@ https://docs.google.com/document/d/1F2yk1wv0lL_Ocvh1hiFxwDZOSa5mFdcvSOZx6eUIfZs/
 
 Most best of all works.
 
-even betterer than the works of Leonardi DaCaprio.
+even betterer than the works of Leonardo DiCaprio.
 
